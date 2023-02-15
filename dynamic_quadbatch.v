@@ -47,7 +47,7 @@ mut:
 }
 
 fn (mut a App) run() {
-	title := 'V Simple Shader Example'
+	title := 'V Dynamic Quad Shader Example'
 	desc := sapp.Desc{
 		width: a.width
 		height: a.height
