@@ -25,13 +25,13 @@ fn main() {
 	mut app := &App{
 		width: 800
 		height: 400
-		pass_action: gfx.create_clear_pass(0.0, 0.0, 0.0, 1.0)
+		
 	}
 	app.run()
 }
 
 struct App {
-	pass_action gfx.PassAction
+	pass_action gfx.Pass
 mut:
 	width           int
 	height          int
@@ -109,7 +109,7 @@ fn (mut app App) add_quad(x f32, y f32, size f32, r f32, g f32, b f32, a f32) {
 }
 
 fn init(user_data voidptr) {
-	mut app := &App(user_data)
+	mut app := unsafe {&App(user_data)}
 	mut desc := sapp.create_desc()
 
 	gfx.setup(&desc)
@@ -179,7 +179,7 @@ fn cleanup(user_data voidptr) {
 }
 
 fn frame(user_data voidptr) {
-	mut app := &App(user_data)
+	mut app := unsafe { &App(user_data) }
 
 	// NOTE: This is meant to stop the drawing procedures if there's no vertex/index data, even though it does stop drawing, it
 	// doesn't draw after the vertex arrays are repopulated after being cleared.
@@ -195,8 +195,13 @@ fn frame(user_data voidptr) {
 	// 	app.vertex_array.clear()
 	// 	app.index_array.clear()
 	// }
-
-	gfx.begin_default_pass(&app.pass_action, sapp.width(), sapp.height())
+	//gfx.beg
+	mut pass_action := gfx.PassAction{}
+	pass_action.colors[0] = gfx.ColorAttachmentAction{
+		load_action: .clear
+		clear_value: gfx.Color{b: 0.9}
+	}
+	gfx.begin_pass(sapp.create_default_pass(pass_action))
 	gfx.apply_viewport(0, 0, app.width, app.height, true)
 
 	// update vertex buffer with vertex array data
