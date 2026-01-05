@@ -115,7 +115,7 @@ fn init(user_data voidptr) {
 	gfx.setup(&desc)
 
 	// Add quads to vertex/index array
-	app.add_quad(0,0, 0.25, 1, 1, 1, 1)
+	//app.add_quad(0,0, 0.25, 1, 1, 1, 1)
 
 	// vertex buffer
 
@@ -188,7 +188,9 @@ fn frame(user_data voidptr) {
 
 	// NOTE: This was to test clearing the vertex/index array to see how Sokol handles updating
 	// the buffer with empty array data. This results in a Sokol runtime error. So there MUST be at least
-	// one vertex entry in the vertex array at all times. :'(
+	// one vertex entry in the vertex array at all times. :'( EDIT: The issue was calling `update_buffer` when there's
+	// no data in either the index or vertex buffer. (I'm a moron. Lol.) Forgot to ommit via if statement the update_buffer
+	// call if there's no data in the buffer. xD 
 
 	app.frame_count += 1
 	// if app.frame_count > 60*5 {
@@ -209,18 +211,25 @@ fn frame(user_data voidptr) {
 		ptr: app.vertex_array.data
 		size: usize(app.vertex_array.len * int(sizeof(Vertex_t)))
 	}
-	gfx.update_buffer(app.bind.vertex_buffers[0], &vertex_buff_range)
+	if app.index_array.len > 1 {
+		gfx.update_buffer(app.bind.vertex_buffers[0], &vertex_buff_range)
+	}
 
 	// update index buffer with index array data
 	index_buff_range := gfx.Range{
 		ptr: app.index_array.data
 		size: usize(app.index_array.len * int(sizeof(u32)))
 	}
-	gfx.update_buffer(app.bind.index_buffer, &index_buff_range)
+	if app.index_array.len > 1 {
+		gfx.update_buffer(app.bind.index_buffer, &index_buff_range)
+	}
 
 	gfx.apply_pipeline(app.shader_pipeline)
 	gfx.apply_bindings(&app.bind)
-	gfx.draw(0, app.index_array.len, 1)
+
+	if app.index_array.len > 1 {
+		gfx.draw(0, app.index_array.len, 1)
+	}
 
 	gfx.end_pass()
 	gfx.commit()
