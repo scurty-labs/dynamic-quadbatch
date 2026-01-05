@@ -211,13 +211,13 @@ fn frame(user_data voidptr) {
 		ptr: app.vertex_array.data
 		size: usize(app.vertex_array.len * int(sizeof(Vertex_t)))
 	}
-	if app.index_array.len > 1 {
+	if app.vertex_array.len > 1 {
 		gfx.update_buffer(app.bind.vertex_buffers[0], &vertex_buff_range)
 	}
 
 	// update index buffer with index array data
 	index_buff_range := gfx.Range{
-		ptr: app.index_array.data
+		ptr: app.index_array.data 
 		size: usize(app.index_array.len * int(sizeof(u32)))
 	}
 	if app.index_array.len > 1 {
